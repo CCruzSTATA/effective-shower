@@ -1,0 +1,396 @@
+*****************************************************
+** Universidad de los Andes - Facultad de Economía **
+** 			   *Taller 2 econometria 2             **
+** 			   						               **
+** 			                                 	   **
+**											       **
+** Estudiante: Carlos Cruz	       201924894       **
+**		       Alejandro Monsalve  201913329       **
+**								                   **
+*****************************************************
+**Queremos ver el efecto de facilitar el registro anres de las votaciones
+**Hipotesis 1
+**Hipotesis 2
+
+cls
+clear all
+cd "/Users/carloscruz/Desktop/ECONOMETRIA2/TALLER2STATA"
+use "/Users/carloscruz/Desktop/ECONOMETRIA2/TALLER2STATA/Elecciones japon 2.dta", clear
+br
+
+****Limpieza de la base 
+
+keep nacimiento fecha Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+							
+gen fecha_nueva = d("10jul2016") - 18*365
+format fecha_nueva %td
+
+sort nacimiento
+drop if nacimiento ==. 
+gen X = fecha - 14075
+
+*****
+
+
+/* Queremos buscar el mejor grado de polinomio para cada periodoEL MEJOR ES EL 2*/
+foreach p in 0 1 2 3 4{
+	rdplot Q22_1 X, c(0) p(`p') graph_options(name(poly_`p', replace) legend(off))
+}
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4
+
+
+/* Queremos buscar el mejor grado de polinomio EL MEJOR ES EL 1*/
+foreach p in 0 1 2 3 4{
+	rdplot Q22_2 X, c(0) p(`p') graph_options(name(poly_`p', replace) legend(off))
+}
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4
+
+
+
+/* Queremos buscar el mejor grado de polinomio EL MEJOR ES EL 4*/
+foreach p in 0 1 2 3 4{
+	rdplot Q22_3 X, c(0) p(`p') graph_options(name(poly_`p', replace) legend(off))
+}
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4
+
+
+
+/* Queremos buscar el mejor grado de polinomio EL MEJOR ES EL 1*/
+foreach p in 0 1 2 3 4{
+	rdplot Q22_4 X, c(0) p(`p') graph_options(name(poly_`p', replace) legend(off))
+}
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4
+
+
+
+/* Queremos buscar el mejor grado de polinomio EL MEJOR ES EL 1*/
+foreach p in 0 1 2 3 4{
+	rdplot Q22_5 X, c(0) p(`p') graph_options(name(poly_`p', replace) legend(off))
+}
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4
+
+
+
+/* Queremos buscar el mejor grado de polinomio EL MEJOR ES EL 3*/ 
+foreach p in 0 1 2 3 4{
+	rdplot Q22_6 X, c(0) p(`p') graph_options(name(poly_`p', replace) legend(off))
+}
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4
+
+
+**Observar la participación solamente por cada periodo
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) h(10 10) kernel(uni)
+    rdplot `var' X, c(0) p(1)  h(10 10) graph_options(name(poly_h_`var'_10, replace) legend(off))
+	
+}
+est table poly_h_* , p(%5.4f)
+graph combine poly_h_Q22_1_10 poly_h_Q22_2_10 poly_h_Q22_3_10 poly_h_Q22_4_10 poly_h_Q22_5_10 poly_h_Q22_6_10 poly_h__Q17_1_10 poly_h_Q17_2_10 poly_h_Q17_3_10 poly_h_Q17_4_10 poly_h_Q17_5_10 poly_h_Q17_6_10 poly_h_Q17_7_10 , xcommon ycommon 
+
+
+***Para ancho de banda 20
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) h(20 20) kernel(uni)
+    rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_20, replace) legend(off))
+	
+}
+est table poly_h_* , p(%5.4f)
+graph combine poly_h_Q22_1_20 poly_h_Q22_2_20 poly_h_Q22_3_20 poly_h_Q22_4_20 poly_h_Q22_5_20 poly_h_Q22_6_20 poly_h_Q17_1_20 poly_h_Q17_2_20 poly_h_Q17_3_20 poly_h_Q17_4_20 poly_h_Q17_5_20 poly_h_Q17_6_20 poly_h_Q17_7_20 , xcommon ycommon 
+
+
+***Para ancho de banda 30
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) h(20 20) kernel(uni)
+    rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_30, replace) legend(off))
+	
+}
+est table poly_h* , p(%5.4f)
+graph combine poly_h_Q22_1_30 poly_h_Q22_2_30 poly_h_Q22_3_30 poly_h_Q22_4_30 poly_h_Q22_5_30 poly_h_Q22_6_30 poly_h_Q17_1_30 poly_h_Q17_2_30 poly_Q17_3_30 poly_h_Q17_4_30 poly_h_Q17_5_30 poly_h_Q17_6_30 poly_h_Q17_7_30 , xcommon ycommon
+
+
+
+*****
+*1.b.
+
+
+
+/* Nitida vs difusa (borrosa)
+  En el caso de que se sospeche que haya un problema de endogeneidad debido a que el hecho de estar por encima o por debajo del punto de corte se relacione con algo que no se tiene en cuenta en el modelo. 
+  Esto implica que la probabilidad de formar parte del tratamiento cambia abruptamente en la discnotinuidad, pero no pasa de 0 a 1 debido a que existe la posibilidad de que debajo de la discontinuidad haya unidades de observación recibiendo el tratamiento y después de la discontinuidad puede haber unidades de observación no recibiendo el tratamiento (i.e. existe la posibilidad de que existan never-takers y always-takers.
+  Para el ejemplo de la clase no es tan claro porque si o si tendrán un gobierno islamico o secular. Esto aplica para casos como becas basadas en la calificación de algún examen de admisión estandarizado, donde al final la beca no es obligatoria. 
+  
+ Imaginemos que igual puede pasar con nuestra base de datos. En ese sentido, se debe instrumentar la participación por alguna variable Z que se haya identificado como variable que puede explicar la parte exógena del hecho de pasar el punto de corte */
+ 
+
+*rdrobust Y X, c(0) p(2)  fuzzy(Q16) //difusa fuzzy(variable instrumento)//
+
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(10 10) kernel(uni)
+    rdplot `var' X, c(0) p(0)  h(10 10) graph_options(name(poly_h_`var'_10_fuzzy, replace) legend(off))
+	
+}
+est table poly_h_* , p(%5.4f)
+graph combine poly_h_Q22_1_10_fuzzy poly_h_Q22_2_10_fuzzy poly_h_Q22_3_10_fuzzy poly_h_Q22_4_10_fuzzy poly_h_Q22_5_10_fuzzy poly_h_Q22_6_10_fuzzy poly_h_Q17_1_10_fuzzy poly_h_Q17_2_10_fuzzy poly_h_Q17_3_10_fuzzy poly_h_Q17_4_10_fuzzy poly_h_Q17_5_10_fuzzy poly_h_Q17_6_10_fuzzy poly_h_Q17_7_10_fuzzy , xcommon ycommon 
+
+
+***Para ancho de banda 20
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(uni)
+    rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_20_fuzzy, replace) legend(off))
+	
+}
+est table poly_h_* , p(%5.4f)
+graph combine poly_h_Q22_1_20_fuzzy poly_h_Q22_2_20_fuzzy poly_h_Q22_3_20_fuzzy poly_h_Q22_4_20_fuzzy poly_h_Q22_5_20_fuzzy poly_h_Q22_6_20_fuzzy poly_h_Q17_1_20_fuzzy poly_h_Q17_2_20_fuzzy poly_h_Q17_3_20_fuzzy poly_h_Q17_4_20_fuzzy poly_h_Q17_5_20_fuzzy poly_h_Q17_6_20_fuzzy poly_h_Q17_7_20_fuzzy , xcommon ycommon 
+
+
+***Para ancho de banda 30
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(uni)
+    rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_30_fuzzy, replace) legend(off))
+	
+}
+est table poly_h* , p(%5.4f)
+graph combine poly_h_Q22_1_30_fuzzy poly_h_Q22_2_30_fuzzy poly_h_Q22_3_30_fuzzy poly_h_Q22_4_30_fuzzy poly_h_Q22_5_30_fuzzy poly_h_Q22_6_30_fuzzy poly_h_Q17_1_30_fuzzy poly_h_Q17_2_30_fuzzy poly_h_Q17_3_30_fuzzy poly_h_Q17_4_30_fuzzy poly_h_Q17_5_30_fuzzy poly_h_Q17_6_30_fuzzy poly_h_Q17_7_30_fuzzy , xcommon ycommon 
+
+
+
+
+**1.c **Use kerrnel triangular
+
+
+
+**Observar la participación solamente por cada periodo
+
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(10 10) kernel(triangular)
+    rdplot `var' X, c(0) p(0)  h(10 10) graph_options(name(poly_h_`var'_10_fuzzy, replace) legend(off))
+	
+}
+est table poly_h_* , p(%5.4f)
+graph combine poly_h_Q22_1_10_fuzzy poly_h_Q22_2_10_fuzzy poly_h_Q22_3_10_fuzzy poly_h_Q22_4_10_fuzzy poly_h_Q22_5_10_fuzzy poly_h_Q22_6_10_fuzzy poly_h_Q17_1_10_fuzzy poly_h_Q17_2_10_fuzzy poly_h_Q17_3_10_fuzzy poly_h_Q17_4_10_fuzzy poly_h_Q17_5_10_fuzzy poly_h_Q17_6_10_fuzzy poly_h_Q17_7_10_fuzzy , xcommon ycommon 
+
+
+***Para ancho de banda 20
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(triangular)
+    rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_20_fuzzy, replace) legend(off))
+	
+}
+est table poly_h_* , p(%5.4f)
+graph combine poly_h_Q22_1_20_fuzzy poly_h_Q22_2_20_fuzzy poly_h_Q22_3_20_fuzzy poly_h_Q22_4_20_fuzzy poly_h_Q22_5_20_fuzzy poly_h_Q22_6_20_fuzzy poly_h_Q17_1_20_fuzzy poly_h_Q17_2_20_fuzzy poly_h_Q17_3_20_fuzzy poly_h_Q17_4_20_fuzzy poly_h_Q17_5_20_fuzzy poly_h_Q17_6_20_fuzzy poly_h_Q17_7_20_fuzzy , xcommon ycommon 
+
+
+***Para ancho de banda 30
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(triangular)
+    rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_30_fuzzy, replace) legend(off))
+	
+}
+est table poly_h* , p(%5.4f)
+graph combine poly_h_Q22_1_30_fuzzy poly_h_Q22_2_30_fuzzy poly_h_Q22_3_30_fuzzy poly_h_Q22_4_30_fuzzy poly_h_Q22_5_30_fuzzy poly_h_Q22_6_30_fuzzy poly_h_Q17_1_30_fuzzy poly_h_Q17_2_30_fuzzy poly_h_Q17_3_30_fuzzy poly_h_Q17_4_30_fuzzy poly_h_Q17_5_30_fuzzy poly_h_Q17_6_30_fuzzy poly_h_Q17_7_30_fuzzy , xcommon ycommon
+
+
+
+***1.d ****USE ANCHO DE BANDA OPTIMO
+
+/* rdbwselect: nos ayuda a identificar cual es el Ancho de banda óptimo según el grado de polinomio */
+
+
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+
+foreach var of local variables {
+    
+rdbwselect `var' X, c(0) p(1) fuzzy(Q16) kernel(uni) all
+		local h=e(h_mserd)
+		rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(`h' `h')
+		est store poly_5 
+		rdplot `var' X if (X>-`h' & X<`h'), c(0) p(1) fuzzy(Q16) h(`h' `h')  ci(99) shade graph_options(name(poly_h_`var'_optimo, replace) title(poly_`var') legend(off))
+	}
+est table poly_h* , p(%5.4f)
+graph combine poly_h_Q22_1_optimo poly_h_Q22_2_optimo poly_h_Q22_3_optimo poly_h_Q22_4_optimo poly_h_Q22_5_optimo poly_h_Q22_6_optimo poly_h__Q17_1_optimo poly_h__Q17_2_optimo poly_h__Q17_3_optimo poly_h_Q17_4_optimo poly_h__Q17_5_optimo poly_h__Q17_6_optimo poly_h__Q17_7_optimo , xcommon ycommon
+
+
+
+local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6
+
+foreach var of local variables {
+    
+rdbwselect `var' X, c(0) p(1) fuzzy(Q16) kernel(uni) all
+		local h=e(h_mserd)
+		asdoc rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(`h' `h')
+		est store poly_5 
+
+outreg2 using "punto1d.doc", replace label  
+
+		
+	}
+
+*******FIN PUNTO 1
+
+****COMIENZO PUNTO 2
+
+cls
+clear all
+cd "/Users/carloscruz/Desktop/ECONOMETRIA2/TALLER2STATA"
+use "juzgados.dta"
+br
+
+reg IEP treated
+
+xtset juzgado year
+xtreg IEP treated, fe
+
+** Efectos Fijos - within
+areg IEP treated, absorb(juzgado year)
+
+**Prueba de hipótesis del contraste de efectos fijos
+testparm _cons
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*******Extra******
+**Analisis multiple.
+
+
+keep nacimiento fecha Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_5 Q17_6 Q17_7 Q16
+							
+gen Veces_participacion = Q22_1 + Q22_2 + Q22_3 + Q22_4 + Q22_5 + Q22_6
+
+replace Veces_participacion = 0 if missing(Veces_participacion)
+
+gen fecha_nueva = d("10jul2016") - 18*365
+format fecha_nueva %td
+
+sort nacimiento
+drop if nacimiento ==. 
+
+
+gen X = fecha - 14075
+rename Veces_participacion Y
+
+gen T = 1 if X <= 0
+replace T = 0 if missing(T)
+twoway (scatter Y X if X>0)  (scatter Y X if X<0) , name(g1, replace) 
+mean Y, over(T)
+coefplot , vertical  name(g2, replace )
+ttest Y, by(T)
+graph combine g1 g2
+rdplot Y X, c(0) p(0) graph_options(name(g3, replace) legend(off))
+/* 	Este comando resume un poco los puntos en "bins" agrupando grandes porciones de datos en uno solo (por eso se ven menos puntos).
+	Adicionalmente, puede identificar si hay cambios estructurales dependiendo del grado del polinomio (opción "p(#)")
+	Ejemplo: polinomio de grado 1 (abajo) */ 
+twoway (scatter Y X if X>0) (lfit Y X if X>0)  (scatter Y X if X<0) (lfit Y X if X<0) , name(g4, replace) 
+
+/* Queremos buscar el mejor grado de polinomio */
+foreach p in 0 1 2 3 4{
+	rdplot Y X, c(0) p(`p') graph_options(name(poly_`p', replace) legend(off))
+}
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4 
+/* podemos tomar el valor del primer criterio: mserd */
+ereturn list 
+* Stata lo almacena como "e(h_mserd)" y con esto, podemos incluirlo en un loop para hacer todas las estimaciones con el ancho de banda óptimo para cada grado del polinomio.
+/* rdbwselect: nos ayuda a identificar cual es el Ancho de banda óptimo según el grado de polinomio */
+rdbwselect Y X, c(0) p(1) kernel(uni) all
+rdbwselect Y X, c(0) p(2) kernel(uni) all
+
+foreach p in 0 1 2 3 4{
+		rdbwselect Y X, c(0) p(`p') kernel(uni) all
+		local h=e(h_mserd)
+		rdrobust Y X, c(0) p(`p') h(`h' `h')
+		est store poly_`p' 
+		rdplot Y X if (X>-`h' & X<`h'), c(0) p(`p') h(`h' `h')  ci(99) shade graph_options(name(poly_`p', replace) title(poly_`p') legend(off))
+	}
+
+est table poly_0 poly_1 poly_2 poly_3 poly_4 , p(%5.4g)
+*Estos estimadores no son comparables, pero serían los mejores en cada grado de polinomio. Si queremos comparar entre los mismos, debemos mantener el mismo ancho de banda
+graph combine poly_0 poly_1 poly_2 poly_3 poly_4 , xcommon 
+
+
+/* Verificación de la manipulación del tratamiento
+*/
+ssc install rddensity
+ssc install lpdensity
+rddensity X , c(0) plot
+	* la H0: No hay manipulación vs. Ha: hay manipulación. 
+
+/* Nitida vs difusa (borrosa)
+  En el caso de que se sospeche que haya un problema de endogeneidad debido a que el hecho de estar por encima o por debajo del punto de corte se relacione con algo que no se tiene en cuenta en el modelo. 
+  Esto implica que la probabilidad de formar parte del tratamiento cambia abruptamente en la discnotinuidad, pero no pasa de 0 a 1 debido a que existe la posibilidad de que debajo de la discontinuidad haya unidades de observación recibiendo el tratamiento y después de la discontinuidad puede haber unidades de observación no recibiendo el tratamiento (i.e. existe la posibilidad de que existan never-takers y always-takers.
+  Para el ejemplo de la clase no es tan claro porque si o si tendrán un gobierno islamico o secular. Esto aplica para casos como becas basadas en la calificación de algún examen de admisión estandarizado, donde al final la beca no es obligatoria. 
+  
+ Imaginemos que igual puede pasar con nuestra base de datos. En ese sentido, se debe instrumentar la participación por alguna variable Z que se haya identificado como variable que puede explicar la parte exógena del hecho de pasar el punto de corte */
+ 
+rdrobust Y X, c(0) p(2) 
+rdrobust Y X, c(0) p(2)  fuzzy( hischshr1520m )
+
+
+
+**Para actividades civicas de froma agregada
+
+
+rdrobust Y X, c(0) p(4) h(10 10) kernel(uni)
+rdrobust Y X, c(0) p(4) h(20 20) kernel(uni)
+rdrobust Y X, c(0) p(4) h(30 30) kernel(uni)
+
+foreach h in 30 20 10 {
+	rdrobust Y X, c(0) p(4) h(`h' `h')
+	est store poly_h_`h'
+	rdplot Y X if (X>-`h' & X<`h'), c(0) p(0) graph_options(name(poly_h_`h', replace) legend(off))
+}
+est table poly_h* , p(%5.4f)
+graph combine poly_h_30 poly_h_20 poly_h_10 , xcommon ycommon 
