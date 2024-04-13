@@ -179,7 +179,7 @@ graph combine poly_h_Q22_1_30_fuzzy poly_h_Q22_2_30_fuzzy poly_h_Q22_3_30_fuzzy 
 
 
 
-**1.c **Use kerrnel triangular
+**1.c **Use kerrnel rectangular
 
 
 
@@ -190,7 +190,7 @@ local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_
 
 foreach var of local variables {
     
-	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(10 10) kernel(triangular)
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(10 10) kernel(CAMBIAR POR RECTAGULAR)
     rdplot `var' X, c(0) p(0)  h(10 10) graph_options(name(poly_h_`var'_10_fuzzy, replace) legend(off))
 	
 }
@@ -204,7 +204,7 @@ local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_
 
 foreach var of local variables {
     
-	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(triangular)
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(CAMBIAR POR RECTAGULAR)
     rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_20_fuzzy, replace) legend(off))
 	
 }
@@ -218,7 +218,7 @@ local variables Q22_1 Q22_2 Q22_3 Q22_4 Q22_5 Q22_6 Q17_1 Q17_2 Q17_3 Q17_4 Q17_
 
 foreach var of local variables {
     
-	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(triangular)
+	rdrobust `var' X, c(0) p(1) fuzzy(Q16) h(20 20) kernel(CAMBIAR POR RECTAGULAR)
     rdplot `var' X, c(0) p(1)  h(20 20) graph_options(name(poly_h_`var'_30_fuzzy, replace) legend(off))
 	
 }
@@ -272,36 +272,27 @@ cd "/Users/carloscruz/Desktop/ECONOMETRIA2/TALLER2STATA"
 use "juzgados.dta"
 br
 
+*a/rta
+
 reg IEP treated
 
-xtset juzgado year
+*b/rta
+
+reg IEP treated i.id_municipio
+est store LSDV
+
+
+**C/RTA Efectos Fijos - within
+
 xtreg IEP treated, fe
 
-** Efectos Fijos - within
-areg IEP treated, absorb(juzgado year)
-
-**Prueba de hipótesis del contraste de efectos fijos
-testparm _cons
 
 
 
+** Contraste F
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+reg IEP treated i.id_municipio
+testparm i.id_municipio
 
 *******Extra******
 **Analisis multiple.
